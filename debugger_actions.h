@@ -48,3 +48,5 @@ void display_stack_frame(unsigned char* buffer, int size);
 int show_info_reg(HANDLE thread_handle);
 // prints the commands available for the debugger.
 void print_help();
+// This function prints the string at the address given.
+void examine_string(unsigned long long full_address);

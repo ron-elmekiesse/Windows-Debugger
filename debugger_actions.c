@@ -124,7 +124,6 @@ int run_process()
 	{ // if failed.
 		return -1;
 	}
-	
 	return 0;
 }
 
@@ -258,7 +257,7 @@ void display_stack_frame(unsigned char* buffer, int size)
 			else
 				printf("  ");
 		}
-		printf("%llx", *(unsigned long long*)&buffer[i]);
+		printf("%016llx", *(unsigned long long*)&buffer[i]); // TODO: push to git hub again!!!!!
 	}
 		//
 	puts("");
@@ -295,9 +294,36 @@ void print_help()
 	printf("Commands:\n");
 	printf("'run' -> to run the debuggee\n");
 	printf("'stepi' -> to make a single step\n");
-	printf("'b {offset - hex}' -> to set a break point at the offset given (in hex)\n");
-	printf("'db {offset - hex}' -> to delete a break point at the offset given (in hex)\n");
+	printf("'b {offset - hex}' -> to set a break point at the offset from LpStartAddress given (in hex)\n");
+	printf("'db {offset - hex}' -> to delete a break point at the offset from LpStartAddress given (in hex)\n");
 	printf("'reg' -> to display the register's values\n");
 	printf("'stack' -> to display the current stack frame\n");
+	printf("'x/s {offset - hex}' -> to display a string at an offset from LpStartAddress given\n");
 	printf("'q' -> to quit - close the debugger\n");
+}
+
+void examine_string(unsigned long long full_address)
+{
+	int res = 0, tav = 1, read = 0;
+
+	printf("%#016llx: '", full_address);
+
+	while (tav != 0)
+	{
+		res = ReadProcessMemory( // reading 1 bytes until the null byte.
+			pi.hProcess, 
+			full_address++, 
+			&tav, 
+			sizeof(BYTE), 
+			NULL
+		);
+
+		if (!res)
+		{
+			printf("Failed to examine string with: %d\n", GetLastError());
+			return;
+		}
+		printf("%c", tav);
+	}
+	puts("'");
 }

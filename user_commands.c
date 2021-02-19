@@ -2,11 +2,12 @@
 
 COMMAND_INFO COMMANDS[MAX_COMMANDS] = 
 {	{RUN, 0},
-	{B, 1},
+	{BREAK, 1},
 	{DB, 1},
 	{STEPI, 0},
 	{INFO_REG, 0},
 	{STACK, 0},
+	{XS, 1},
 	{HELP, 0},
 	{QUIT, 0}
 };
@@ -26,7 +27,7 @@ int make_user_commands()
 
 	while (!finished)
 	{
-		printf("$");
+		printf("$ ");
 		fgets(buf, MAX_COMMAND_LEN, stdin); // get command
 		ptr = strchr(buf, '\n');
 		if (ptr)
@@ -60,13 +61,15 @@ int make_user_commands()
 void parse_command(char* buf, char* command_out, char* extra_data_out)
 {
 	char* temp = NULL;
+	char temp_buf[MAX_COMMAND_LEN] = { 0 };
 
 	if (strchr(buf, ' ') && buf[strnlen(buf, MAX_COMMAND_LEN) - 1] != ' ') // if command is with ' ' and not ends with ' '.
 	{
-		temp = strtok(buf, " ");
+		strncpy(temp_buf, buf, MAX_COMMAND_LEN); // strtok changes the buffer given.....
+		
+		temp = strtok(temp_buf, " ");
 		strncpy(command_out, temp, MAX_COMMAND_LEN);
-		temp = strtok(NULL, " ");
-		strncpy(extra_data_out, temp, MAX_COMMAND_LEN);
+		strncpy(extra_data_out, buf + strnlen(temp, MAX_COMMAND_LEN)+1, MAX_COMMAND_LEN); // copy all the extra data
 	}
 	else
 	{
@@ -106,7 +109,7 @@ int make_command(char* command, char* extra_data) // could have made a struct wi
 	{
 		return RUN_PROC;
 	}
-	else if (strncmp(command, B, MAX_COMMAND_LEN) == 0) // insert a break point.
+	else if (strncmp(command, BREAK, MAX_COMMAND_LEN) == 0) // insert a break point.
 	{
 		res = empty_place_in_bp_table();
 		if (!res)
@@ -176,6 +179,16 @@ int make_command(char* command, char* extra_data) // could have made a struct wi
 			printf("Failed to display current stack frame!\n");
 			return FAILED;
 		}
+	}
+	else if (strncmp(command, XS, MAX_COMMAND_LEN) == 0)
+	{
+		address = strtol(extra_data, NULL, 16);
+		if (address == 0)
+		{
+			printf("Invalid address!\n");
+			return FAILED;
+		}
+		examine_string(entry_point + address);
 	}
 	else if (strncmp(command, HELP, MAX_COMMAND_LEN) == 0)
 	{

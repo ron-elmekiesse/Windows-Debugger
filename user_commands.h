@@ -6,15 +6,16 @@
 #include "debugger_actions.h"
 
 #define MAX_COMMAND_LEN 100
-#define MAX_COMMANDS 8
+#define MAX_COMMANDS 9
 #define RUN "run"
-#define B "b"
+#define BREAK "b"
 #define DB "db"
 #define STEPI "stepi"
 #define INFO_REG "reg"
 #define STACK "stack"
 #define HELP "help"
 #define QUIT "q"
+#define XS "x/s"
 
 enum EXIT_CODES {SUCCESS, FAILED, EXIT, RUN_PROC};
 
